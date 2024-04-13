@@ -1,5 +1,6 @@
 import { UserEntity } from 'src/auth/models/user.entity';
 import {
+  Column,
   CreateDateColumn,
   Entity,
   ManyToOne,
@@ -10,6 +11,9 @@ import {
 export class ListingEntity {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @Column()
+  title: string;
 
   @CreateDateColumn()
   createdAt: Date;
