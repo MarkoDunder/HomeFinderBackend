@@ -13,9 +13,9 @@ export class ListingService {
     private readonly listingRepository: Repository<ListingEntity>,
   ) {}
 
-  findAllListings(): Observable<Listing[]> {
+  /* findAllListings(): Observable<Listing[]> {
     return from(this.listingRepository.find());
-  }
+  } */
 
   createListing(user: User, listing: Listing): Observable<Listing> {
     listing.creator = user;

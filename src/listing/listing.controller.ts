@@ -12,12 +12,16 @@ import { Listing } from './models/listing.interface';
 import { Observable } from 'rxjs';
 import { UpdateResult } from 'typeorm';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
+import { Roles } from 'src/auth/decorators/roles.decorator';
+import { Role } from 'src/auth/models/role.enum';
+import { RolesGuard } from 'src/auth/guards/roles.guard';
 
 @Controller('listing')
 export class ListingController {
   constructor(private listingService: ListingService) {}
 
-  @UseGuards(JwtGuard)
+  @Roles(Role.USER, Role.ADMIN)
+  @UseGuards(JwtGuard, RolesGuard)
   @Post()
   create(@Body() listing: Listing, @Request() req): Observable<Listing> {
     return this.listingService.createListing(req.user, listing);

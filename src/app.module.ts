@@ -19,6 +19,7 @@ import { ListingModule } from './listing/listing.module';
       database: process.env.POSTGRES_DATABASE,
       autoLoadEntities: true,
       synchronize: true,
+      logging: true,
     }),
     AuthModule,
     ListingModule,

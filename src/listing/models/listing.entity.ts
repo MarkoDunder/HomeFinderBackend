@@ -15,6 +15,15 @@ export class ListingEntity {
   @Column()
   title: string;
 
+  /* @Column()
+  listingType: ListingType;
+
+  @Column()
+  price: number;
+
+  @Column("text")
+  description: string;
+ */
   @CreateDateColumn()
   createdAt: Date;
 
