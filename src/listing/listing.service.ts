@@ -5,6 +5,8 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ListingEntity } from './models/listing.entity';
 import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Observable, from } from 'rxjs';
+import { UpdateListingDTO } from './dto/updateListing.dto';
+import { CreateListingDTO } from './dto/createListing.dto';
 
 @Injectable()
 export class ListingService {
@@ -17,13 +19,25 @@ export class ListingService {
     return from(this.listingRepository.find());
   }
 
-  createListing(user: User, listing: Listing): Observable<Listing> {
-    listing.creator = user;
-    return from(this.listingRepository.save(listing));
+  findListingById(id: number): Observable<Listing> {
+    return from(
+      this.listingRepository.findOne({
+        where: { id: id },
+        relations: ['creator'],
+      }),
+    );
   }
 
-  updateListing(id: number, listing: Listing): Observable<UpdateResult> {
-    return from(this.listingRepository.update(id, listing));
+  createListing(user: User, listingDTO: CreateListingDTO): Observable<Listing> {
+    // Save the listing to the database
+    return from(this.listingRepository.save({ ...listingDTO, creator: user }));
+  }
+
+  updateListing(
+    id: number,
+    listingDTO: UpdateListingDTO,
+  ): Observable<UpdateResult> {
+    return from(this.listingRepository.update(id, listingDTO));
   }
 
   deleteListing(id: number): Observable<DeleteResult> {

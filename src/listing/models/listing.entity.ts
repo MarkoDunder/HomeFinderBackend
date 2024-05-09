@@ -1,6 +1,5 @@
 import { UserEntity } from 'src/auth/models/user.entity';
 import {
-  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
@@ -29,16 +28,16 @@ export class ListingEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @Column()
+  @CreateDateColumn()
   expiresAt: Date;
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.listings)
   creator: UserEntity;
 
-  @BeforeInsert()
+  /* @BeforeInsert()
   calculateExpiresAt(): void {
     const expiresAt = new Date();
     expiresAt.setDate(this.createdAt.getDate() + 90);
     this.expiresAt = expiresAt;
-  }
+  } */
 }
