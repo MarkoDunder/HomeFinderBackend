@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   Put,
@@ -21,6 +22,16 @@ import { IsCreatorGuard } from './guards/is-creator.guard';
 @Controller('listing')
 export class ListingController {
   constructor(private listingService: ListingService) {}
+
+  @Get('/')
+  findAll(): Observable<Listing[]> {
+    return this.listingService.findAllListings();
+  }
+
+  @Get(':id')
+  findById(@Param('id') id: number): Observable<Listing> {
+    return this.listingService.findListingById(id);
+  }
 
   @Roles(Role.USER, Role.ADMIN)
   @UseGuards(JwtGuard, RolesGuard)

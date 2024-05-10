@@ -1,14 +1,14 @@
 import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
 import { Observable, map, switchMap } from 'rxjs';
-import { AuthService } from 'src/auth/services/auth.service';
 import { ListingService } from '../listing.service';
 import { User } from 'src/auth/models/user.interface';
-import { Listing } from '../../../dist/listing/models/listing.interface';
+import { Listing } from '../models/listing.interface';
+import { UserService } from 'src/auth/services/user.service';
 
 @Injectable()
 export class IsCreatorGuard implements CanActivate {
   constructor(
-    private authService: AuthService,
+    private userService: UserService,
     private listingService: ListingService,
   ) {}
 
@@ -25,7 +25,7 @@ export class IsCreatorGuard implements CanActivate {
     const userId = user.id;
     const listingId = params.id;
 
-    return this.authService.findUserById(userId).pipe(
+    return this.userService.findUserById(userId).pipe(
       switchMap((user: User) =>
         this.listingService.findListingById(listingId).pipe(
           map((listing: Listing) => {
