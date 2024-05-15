@@ -1,10 +1,13 @@
 import { diskStorage } from 'multer';
 import { v4 as uuidv4 } from 'uuid';
 
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fs = require('fs');
-const FileType = require('file-type');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+import * as FileType from 'file-type';
 
 import path = require('path');
+//import { Observable, from, of, switchMap } from 'rxjs';
 
 type validFileExtension = 'png' | 'jpg' | 'jpeg';
 type validMimeType = 'image/png' | 'image/jpg' | 'image/jpeg';
@@ -31,4 +34,45 @@ export const saveImageToStorage = {
     const allowedMimeTypes: validMimeType[] = validMimeTypes;
     allowedMimeTypes.includes(file.mimetype) ? cb(null, true) : cb(null, false);
   },
+};
+
+// Cannot access file type result if I use Observables, so I returned a Promise
+export const isFileExtensionSafe = async (
+  fullFilePath: string,
+): Promise<boolean> => {
+  try {
+    const fileTypeResult = await FileType.fromFile(fullFilePath);
+    if (!fileTypeResult) return false;
+
+    const { ext, mime } = fileTypeResult;
+    let isFileTypeLegit: boolean = false;
+    let isMimeTypeLegit: boolean = false;
+
+    for (const validExt of validFileExtensions) {
+      if (ext === validExt) {
+        isFileTypeLegit = true;
+        break;
+      }
+    }
+
+    for (const valiMime of validMimeTypes) {
+      if (mime === valiMime) {
+        isMimeTypeLegit = true;
+        break;
+      }
+    }
+
+    return isFileTypeLegit && isMimeTypeLegit;
+  } catch (error) {
+    console.error('Error determining file type:', error);
+    return false;
+  }
+};
+
+export const removeFile = (fullFilePath: string): void => {
+  try {
+    fs.unlinkSync(fullFilePath);
+  } catch (error) {
+    console.error(error);
+  }
 };
