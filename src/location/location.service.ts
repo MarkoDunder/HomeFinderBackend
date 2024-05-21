@@ -1,4 +1,8 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class LocationService {}
+export class LocationService {
+  /* getAllCountryCodes(): Observable<string[]> {
+
+    } */
+}

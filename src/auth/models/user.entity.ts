@@ -1,4 +1,11 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  OneToMany,
+  OneToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Role } from './role.enum';
 import { ListingEntity } from 'src/listing/models/listing.entity';
 
@@ -27,4 +34,8 @@ export class UserEntity {
 
   @OneToMany(() => ListingEntity, (listingEntity) => listingEntity.creator)
   listings: ListingEntity[];
+
+  @OneToOne(() => Location)
+  @JoinColumn()
+  location: Location;
 }
