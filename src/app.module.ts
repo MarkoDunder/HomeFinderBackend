@@ -4,6 +4,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { ListingModule } from './listing/listing.module';
+import { APP_FILTER } from '@nestjs/core';
+import { AllExceptionsFilter } from './core/all-exceptions.filter';
+import { LocationController } from './location/location.controller';
 
 @Module({
   imports: [
@@ -24,7 +27,13 @@ import { ListingModule } from './listing/listing.module';
     AuthModule,
     ListingModule,
   ],
-  providers: [AppService],
-  controllers: [],
+  providers: [
+    AppService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+  ],
+  controllers: [LocationController],
 })
 export class AppModule {}

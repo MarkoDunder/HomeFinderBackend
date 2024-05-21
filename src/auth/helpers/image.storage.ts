@@ -48,6 +48,7 @@ export const isFileExtensionSafe = async (
     let isFileTypeLegit: boolean = false;
     let isMimeTypeLegit: boolean = false;
 
+    //manual file checks were needed because I couldnt access the {ext, mime} object methods of includes
     for (const validExt of validFileExtensions) {
       if (ext === validExt) {
         isFileTypeLegit = true;

@@ -1,5 +1,4 @@
-import { Injectable } from '@nestjs/common';
-
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { from, Observable } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
@@ -26,6 +25,14 @@ export class AuthService {
 
     return this.hashPassword(password).pipe(
       switchMap((hashedPassword: string) => {
+        if (!user) {
+          //throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+          throw new HttpException(
+            { status: HttpStatus.NOT_FOUND, error: 'Invalid credentials' },
+            HttpStatus.NOT_FOUND,
+          );
+        }
+
         return from(
           this.userRepository.save({
             firstName,

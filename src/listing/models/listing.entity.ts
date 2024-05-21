@@ -25,6 +25,9 @@ export class ListingEntity {
   @Column('text')
   description: string;
 
+  @Column({ default: false })
+  isSaved: boolean;
+
   @CreateDateColumn()
   createdAt: Date;
 
