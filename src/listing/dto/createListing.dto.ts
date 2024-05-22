@@ -23,4 +23,6 @@ export class CreateListingDTO {
 
   @IsString()
   description: string;
+
+  //location:Location
 }

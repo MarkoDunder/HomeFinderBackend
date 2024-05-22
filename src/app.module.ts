@@ -6,8 +6,8 @@ import { AuthModule } from './auth/auth.module';
 import { ListingModule } from './listing/listing.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './core/all-exceptions.filter';
-import { LocationController } from './location/location.controller';
 import { ChatModule } from './chat/chat.module';
+import { LocationModule } from './location/location.module';
 
 @Module({
   imports: [
@@ -28,6 +28,7 @@ import { ChatModule } from './chat/chat.module';
     AuthModule,
     ListingModule,
     ChatModule,
+    LocationModule,
   ],
   providers: [
     AppService,
@@ -36,6 +37,6 @@ import { ChatModule } from './chat/chat.module';
       useClass: AllExceptionsFilter,
     },
   ],
-  controllers: [LocationController],
+  controllers: [],
 })
 export class AppModule {}

@@ -23,13 +23,12 @@ export class ListingService {
     return from(
       this.listingRepository.findOne({
         where: { id: id },
-        relations: ['creator'],
+        relations: ['creator'], //relations: ['creator', 'location'],
       }),
     );
   }
 
   createListing(user: User, listingDTO: CreateListingDTO): Observable<Listing> {
-    // Save the listing to the database
     return from(this.listingRepository.save({ ...listingDTO, creator: user }));
   }
 

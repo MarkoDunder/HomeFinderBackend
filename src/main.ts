@@ -11,7 +11,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableCors();
   app.setGlobalPrefix('api/v1');
-  app.use(morgan('combined', { stream: logStream }));
+  app.use(morgan.default('combined', { stream: logStream }));
   await app.listen(3001);
 }
 bootstrap();

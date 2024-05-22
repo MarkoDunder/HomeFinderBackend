@@ -7,7 +7,9 @@ export interface Listing {
   listingType: ListingType;
   price: number;
   description: string;
+  isSaved: boolean;
   createdAt: Date;
   expiresAt: Date;
+  //location: Location;
   creator: User;
 }

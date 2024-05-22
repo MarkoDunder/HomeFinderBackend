@@ -5,9 +5,9 @@ export class LocationEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column('countryCode')
+  @Column()
   countryCode: string;
 
-  @Column('city')
+  @Column()
   city: string;
 }

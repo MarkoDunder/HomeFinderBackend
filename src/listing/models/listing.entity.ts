@@ -34,6 +34,10 @@ export class ListingEntity {
   @CreateDateColumn()
   expiresAt: Date;
 
+  /* @OneToOne(() => Location)
+  @JoinColumn()
+  location: Location; */
+
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.listings)
   creator: UserEntity;
 
