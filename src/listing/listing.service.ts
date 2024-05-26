@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { User } from 'src/auth/models/user.interface';
 import { Listing } from './models/listing.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ListingEntity } from './models/listing.entity';
@@ -7,6 +6,7 @@ import { DeleteResult, Repository, UpdateResult } from 'typeorm';
 import { Observable, from } from 'rxjs';
 import { UpdateListingDTO } from './dto/updateListing.dto';
 import { CreateListingDTO } from './dto/createListing.dto';
+import { UserEntity } from 'src/auth/models/user.entity';
 
 @Injectable()
 export class ListingService {
@@ -28,8 +28,15 @@ export class ListingService {
     );
   }
 
-  createListing(user: User, listingDTO: CreateListingDTO): Observable<Listing> {
-    return from(this.listingRepository.save({ ...listingDTO, creator: user }));
+  createListing(
+    user: UserEntity,
+    listingDTO: CreateListingDTO,
+  ): Observable<ListingEntity> {
+    const listing = this.listingRepository.create(listingDTO);
+    listing.creator = user;
+    listing.expiresAt = this.calculateExpirationDate(); // Set the expiresAt date
+
+    return from(this.listingRepository.save(listing));
   }
 
   updateListing(
@@ -41,5 +48,11 @@ export class ListingService {
 
   deleteListing(id: number): Observable<DeleteResult> {
     return from(this.listingRepository.delete(id));
+  }
+
+  private calculateExpirationDate(): Date {
+    const expiresAt = new Date();
+    expiresAt.setDate(expiresAt.getDate() + 60); // Adds 60 days to the current date
+    return expiresAt;
   }
 }

@@ -31,7 +31,7 @@ export class ListingEntity {
   @CreateDateColumn()
   createdAt: Date;
 
-  @CreateDateColumn()
+  @Column({ nullable: true })
   expiresAt: Date;
 
   /* @OneToOne(() => Location)
@@ -40,11 +40,4 @@ export class ListingEntity {
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.listings)
   creator: UserEntity;
-
-  /* @BeforeInsert()
-  calculateExpiresAt(): void {
-    const expiresAt = new Date();
-    expiresAt.setDate(this.createdAt.getDate() + 90);
-    this.expiresAt = expiresAt;
-  } */
 }
