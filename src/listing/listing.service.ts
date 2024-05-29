@@ -34,7 +34,7 @@ export class ListingService {
   ): Observable<ListingEntity> {
     const listing = this.listingRepository.create(listingDTO);
     listing.creator = user;
-    listing.expiresAt = this.calculateExpirationDate(); // Set the expiresAt date
+    listing.expiresAt = this.calculateExpirationDate();
 
     return from(this.listingRepository.save(listing));
   }
@@ -52,7 +52,21 @@ export class ListingService {
 
   private calculateExpirationDate(): Date {
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 60); // Adds 60 days to the current date
+    expiresAt.setDate(expiresAt.getDate() + 60);
     return expiresAt;
+  }
+
+  findSavedListingsByUser(userId: number): Observable<ListingEntity[]> {
+    return from(
+      this.listingRepository.find({
+        where: {
+          isSaved: true,
+          creator: {
+            id: userId,
+          },
+        },
+        relations: ['creator'],
+      }),
+    );
   }
 }
