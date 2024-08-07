@@ -70,12 +70,19 @@ export class AuthService {
     );
   }
 
-  login(user: User): Observable<string> {
+  login(user: User): Observable<{ token: string; firstName: string }> {
     const { email, password } = user;
     return this.validateUser(email, password).pipe(
       switchMap((user: User) => {
         if (user) {
-          return from(this.jwtService.signAsync({ user }));
+          return from(this.jwtService.signAsync({ user })).pipe(
+            map((jwt: string) => ({
+              token: jwt,
+              firstName: user.firstName, // Assuming the user's name is stored in `firstName`
+            })),
+          );
+        } else {
+          throw new Error('Invalid credentials');
         }
       }),
     );
