@@ -7,7 +7,7 @@ import { ListingModule } from './listing/listing.module';
 import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './core/all-exceptions.filter';
 import { ChatModule } from './chat/chat.module';
-import { LocationModule } from './location/location.module';
+import { CustomLocationModule } from './location/location.module';
 
 @Module({
   imports: [
@@ -28,7 +28,7 @@ import { LocationModule } from './location/location.module';
     AuthModule,
     ListingModule,
     ChatModule,
-    LocationModule,
+    CustomLocationModule,
   ],
   providers: [
     AppService,

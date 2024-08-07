@@ -5,10 +5,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ListingEntity } from './models/listing.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { IsCreatorGuard } from './guards/is-creator.guard';
+import { LocationService } from 'src/location/location.service';
+import { CustomLocationModule } from 'src/location/location.module';
+import { CustomLocationEntity } from 'src/location/models/location.entity';
 
 @Module({
-  imports: [AuthModule, TypeOrmModule.forFeature([ListingEntity])],
-  providers: [ListingService, IsCreatorGuard],
+  imports: [
+    AuthModule,
+    TypeOrmModule.forFeature([ListingEntity, CustomLocationEntity]),
+    CustomLocationModule,
+  ],
+  providers: [ListingService, IsCreatorGuard, LocationService],
   controllers: [ListingController],
 })
 export class ListingModule {}

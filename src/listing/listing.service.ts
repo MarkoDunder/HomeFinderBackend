@@ -7,36 +7,61 @@ import { Observable, from } from 'rxjs';
 import { UpdateListingDTO } from './dto/updateListing.dto';
 import { CreateListingDTO } from './dto/createListing.dto';
 import { UserEntity } from 'src/auth/models/user.entity';
-
+import { map } from 'rxjs';
+import { CustomLocation } from 'src/location/models/location.interface';
+import { User } from 'src/auth/models/user.interface';
+import { CustomLocationEntity } from 'src/location/models/location.entity';
+import { LocationService } from 'src/location/location.service';
 @Injectable()
 export class ListingService {
   constructor(
     @InjectRepository(ListingEntity)
     private readonly listingRepository: Repository<ListingEntity>,
+    @InjectRepository(CustomLocationEntity)
+    private readonly locationRepository: Repository<CustomLocationEntity>,
+    private locationService: LocationService,
   ) {}
 
   findAllListings(): Observable<Listing[]> {
-    return from(this.listingRepository.find());
+    return from(
+      this.listingRepository.find({ relations: ['location', 'creator'] }),
+    ).pipe(map((entities) => entities.map((entity) => this.toListing(entity))));
   }
 
   findListingById(id: number): Observable<Listing> {
     return from(
       this.listingRepository.findOne({
         where: { id: id },
-        relations: ['creator'], //relations: ['creator', 'location'],
+        relations: ['creator', 'location'], //relations: ['creator', 'location'],
       }),
     );
   }
 
-  createListing(
+  async createListing(
     user: UserEntity,
-    listingDTO: CreateListingDTO,
-  ): Observable<ListingEntity> {
-    const listing = this.listingRepository.create(listingDTO);
-    listing.creator = user;
-    listing.expiresAt = this.calculateExpirationDate();
+    createListingDto: CreateListingDTO,
+  ): Promise<Listing> {
+    const { customLocation, ...listingData } = createListingDto;
 
-    return from(this.listingRepository.save(listing));
+    console.log('error here');
+    const locationEntity = this.locationRepository.create({
+      countryCode: customLocation.countryCode,
+      city: customLocation.city,
+      zipCode: customLocation.zipCode,
+    });
+
+    const savedLocation = await this.locationRepository.save(locationEntity);
+
+    // Create and save the listing entity
+    const listingEntity = this.listingRepository.create({
+      ...listingData,
+      creator: user,
+      customLocation: savedLocation,
+    });
+
+    const savedListing = await this.listingRepository.save(listingEntity);
+
+    return this.toListing(savedListing);
   }
 
   updateListing(
@@ -65,8 +90,77 @@ export class ListingService {
             id: userId,
           },
         },
-        relations: ['creator'],
+        relations: ['creator', 'location'],
       }),
     );
+  }
+
+  private toListing(entity: ListingEntity): Listing {
+    const {
+      id,
+      title,
+      listingType,
+      price,
+      description,
+      isSaved,
+      createdAt,
+      expiresAt,
+      creator,
+      customLocation,
+    } = entity;
+
+    const mappedLocation: CustomLocation = {
+      id: customLocation.id,
+      countryCode: customLocation.countryCode,
+      city: customLocation.city,
+      zipCode: customLocation.zipCode,
+    };
+
+    const mappedCreator: User = {
+      id: creator.id,
+      firstName: creator.firstName,
+      lastName: creator.lastName,
+      email: creator.email,
+      listings: creator.listings
+        ? creator.listings.map((listing) => ({
+            id: listing.id,
+            title: listing.title,
+            price: listing.price,
+            description: listing.description,
+            listingType: listing.listingType,
+            isSaved: listing.isSaved,
+            createdAt: listing.createdAt,
+            expiresAt: listing.expiresAt,
+            creator: {
+              id: listing.creator.id,
+              firstName: listing.creator.firstName,
+              lastName: listing.creator.lastName,
+              email: listing.creator.email,
+              listings: [], // Provide an empty array to satisfy the User interface  -- QUESTIONABLE
+            },
+            customLocation: listing.customLocation
+              ? {
+                  id: listing.customLocation.id,
+                  countryCode: listing.customLocation.countryCode,
+                  city: listing.customLocation.city,
+                  zipCode: listing.customLocation.zipCode,
+                }
+              : null,
+          }))
+        : [],
+    };
+
+    return {
+      id,
+      title,
+      listingType,
+      price,
+      description,
+      isSaved,
+      createdAt,
+      expiresAt,
+      creator: mappedCreator,
+      customLocation: mappedLocation,
+    };
   }
 }

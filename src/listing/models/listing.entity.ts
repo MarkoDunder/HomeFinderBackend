@@ -5,8 +5,11 @@ import {
   Entity,
   ManyToOne,
   PrimaryGeneratedColumn,
+  OneToOne,
+  JoinColumn,
 } from 'typeorm';
 import { ListingType } from './listingType.enum';
+import { CustomLocationEntity } from 'src/location/models/location.entity';
 
 @Entity('listing')
 export class ListingEntity {
@@ -34,9 +37,9 @@ export class ListingEntity {
   @Column({ nullable: true })
   expiresAt: Date;
 
-  /* @OneToOne(() => Location)
+  @OneToOne(() => CustomLocationEntity)
   @JoinColumn()
-  location: Location; */
+  customLocation: CustomLocationEntity;
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.listings)
   creator: UserEntity;

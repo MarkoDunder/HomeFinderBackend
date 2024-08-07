@@ -1,5 +1,6 @@
 import { User } from 'src/auth/models/user.interface';
 import { ListingType } from './listingType.enum';
+import { CustomLocation } from 'src/location/models/location.interface';
 
 export interface Listing {
   id?: number;
@@ -10,6 +11,6 @@ export interface Listing {
   isSaved: boolean;
   createdAt: Date;
   expiresAt: Date;
-  //location: Location;
   creator: User;
+  customLocation: CustomLocation;
 }

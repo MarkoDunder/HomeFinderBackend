@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('location')
-export class LocationEntity {
+@Entity('custom_location')
+export class CustomLocationEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -10,4 +10,7 @@ export class LocationEntity {
 
   @Column()
   city: string;
+
+  @Column({ default: '10000' })
+  zipCode: string;
 }

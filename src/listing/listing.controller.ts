@@ -46,7 +46,7 @@ export class ListingController {
   @Roles(Role.USER, Role.ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
   @Post()
-  create(@Body() listing: Listing, @Request() req): Observable<Listing> {
+  create(@Body() listing: Listing, @Request() req): Promise<Listing> {
     return this.listingService.createListing(req.user, listing);
   }
 

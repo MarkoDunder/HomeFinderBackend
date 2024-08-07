@@ -6,6 +6,7 @@ import {
   Length,
 } from 'class-validator';
 import { ListingType } from '../models/listingType.enum';
+import { CustomLocation } from 'src/location/models/location.interface';
 
 export class UpdateListingDTO {
   @IsString()
@@ -23,4 +24,7 @@ export class UpdateListingDTO {
 
   @IsString()
   description: string;
+
+  @IsNotEmpty()
+  customLocation: CustomLocation;
 }
