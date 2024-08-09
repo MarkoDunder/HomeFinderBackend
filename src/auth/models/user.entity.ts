@@ -1,7 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Role } from './role.enum';
 import { ListingEntity } from 'src/listing/models/listing.entity';
-
+import { FriendRequestEntity } from './friend-request.entity';
 @Entity('user')
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -27,4 +27,16 @@ export class UserEntity {
 
   @OneToMany(() => ListingEntity, (listingEntity) => listingEntity.creator)
   listings: ListingEntity[];
+
+  @OneToMany(
+    () => FriendRequestEntity,
+    (friendRequestEntity) => friendRequestEntity.creator,
+  )
+  friendRequestCreator: FriendRequestEntity[];
+
+  @OneToMany(
+    () => FriendRequestEntity,
+    (FriendRequestEntity) => FriendRequestEntity.receiver,
+  )
+  friendRequestReceiver: FriendRequestEntity[];
 }

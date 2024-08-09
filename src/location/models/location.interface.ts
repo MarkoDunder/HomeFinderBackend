@@ -3,4 +3,6 @@ export interface CustomLocation {
   countryCode: string;
   city: string;
   zipCode: string;
+  streetName: string;
+  streetNumber: string;
 }

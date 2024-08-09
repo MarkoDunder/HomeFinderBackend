@@ -114,6 +114,8 @@ export class ListingService {
       countryCode: customLocation.countryCode,
       city: customLocation.city,
       zipCode: customLocation.zipCode,
+      streetName: customLocation.streetName,
+      streetNumber: customLocation.streetNumber,
     };
 
     const mappedCreator: User = {
@@ -144,6 +146,8 @@ export class ListingService {
                   countryCode: listing.customLocation.countryCode,
                   city: listing.customLocation.city,
                   zipCode: listing.customLocation.zipCode,
+                  streetName: listing.customLocation.streetName,
+                  streetNumber: listing.customLocation.streetNumber,
                 }
               : null,
           }))

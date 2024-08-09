@@ -13,4 +13,10 @@ export class CustomLocationEntity {
 
   @Column({ default: '10000' })
   zipCode: string;
+
+  @Column({ default: 'Radnicka cesta' })
+  streetName: string;
+
+  @Column({ default: '1' })
+  streetNumber: string;
 }
