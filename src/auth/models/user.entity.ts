@@ -1,7 +1,16 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  OneToMany,
+  PrimaryGeneratedColumn,
+  ManyToMany,
+} from 'typeorm';
 import { Role } from './role.enum';
 import { ListingEntity } from 'src/listing/models/listing.entity';
 import { FriendRequestEntity } from './friend-request.entity';
+import { ConversationEntity } from 'src/chat/model/conversation.entity';
+import { MessageEntity } from 'src/chat/model/message.entity';
+
 @Entity('user')
 export class UserEntity {
   @PrimaryGeneratedColumn()
@@ -39,4 +48,13 @@ export class UserEntity {
     (FriendRequestEntity) => FriendRequestEntity.receiver,
   )
   friendRequestReceiver: FriendRequestEntity[];
+
+  @ManyToMany(
+    () => ConversationEntity,
+    (conversationEntity) => conversationEntity.users,
+  )
+  conversations: ConversationEntity[];
+
+  @OneToMany(() => MessageEntity, (messageEntity) => messageEntity.user)
+  messages: MessageEntity[];
 }

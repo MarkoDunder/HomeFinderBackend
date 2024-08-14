@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { from, Observable } from 'rxjs';
 import { switchMap, map } from 'rxjs/operators';
@@ -7,6 +12,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../models/user.entity';
 import { Repository } from 'typeorm';
 import { JwtService } from '@nestjs/jwt';
+import { UserJwt } from 'src/chat/presence/interfaces/UserJwt.interface';
 
 @Injectable()
 export class AuthService {
@@ -86,5 +92,15 @@ export class AuthService {
         }
       }),
     );
+  }
+
+  async getUserFromHeader(jwt: string): Promise<UserJwt> {
+    if (!jwt) return;
+
+    try {
+      return this.jwtService.decode(jwt) as UserJwt;
+    } catch (error) {
+      throw new BadRequestException();
+    }
   }
 }

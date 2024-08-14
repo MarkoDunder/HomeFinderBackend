@@ -8,6 +8,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { AllExceptionsFilter } from './core/all-exceptions.filter';
 import { ChatModule } from './chat/chat.module';
 import { CustomLocationModule } from './location/location.module';
+import { RedisModule } from './redis.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CustomLocationModule } from './location/location.module';
     ListingModule,
     ChatModule,
     CustomLocationModule,
+    RedisModule,
   ],
   providers: [
     AppService,

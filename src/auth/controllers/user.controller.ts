@@ -99,10 +99,10 @@ export class UserController {
   }
 
   @UseGuards(JwtGuard)
-  @Put('friend-request/respond/:receiverId')
+  @Put('friend-request/respond/:friendRequestId')
   respondToFriendRequest(
     @Param('friendRequestId') friendRequestStringId: string,
-    @Body() statusResponse: FriendRequest_Status,
+    @Body('status') statusResponse: FriendRequest_Status,
   ): Observable<FriendRequestStatus> {
     const friendRequestId = parseInt(friendRequestStringId);
     return this.userService.respondToFriendRequest(

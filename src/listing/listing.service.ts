@@ -11,7 +11,6 @@ import { map } from 'rxjs';
 import { CustomLocation } from 'src/location/models/location.interface';
 import { User } from 'src/auth/models/user.interface';
 import { CustomLocationEntity } from 'src/location/models/location.entity';
-import { LocationService } from 'src/location/location.service';
 @Injectable()
 export class ListingService {
   constructor(
@@ -19,7 +18,6 @@ export class ListingService {
     private readonly listingRepository: Repository<ListingEntity>,
     @InjectRepository(CustomLocationEntity)
     private readonly locationRepository: Repository<CustomLocationEntity>,
-    private locationService: LocationService,
   ) {}
 
   findAllListings(): Observable<Listing[]> {
@@ -48,6 +46,8 @@ export class ListingService {
       countryCode: customLocation.countryCode,
       city: customLocation.city,
       zipCode: customLocation.zipCode,
+      streetName: customLocation.streetName,
+      streetNumber: customLocation.streetNumber,
     });
 
     const savedLocation = await this.locationRepository.save(locationEntity);
@@ -81,7 +81,7 @@ export class ListingService {
     return expiresAt;
   }
 
-  findSavedListingsByUser(userId: number): Observable<ListingEntity[]> {
+  /* findSavedListingsByUser(userId: number): Observable<ListingEntity[]> {
     return from(
       this.listingRepository.find({
         where: {
@@ -93,7 +93,7 @@ export class ListingService {
         relations: ['creator', 'location'],
       }),
     );
-  }
+  } */
 
   private toListing(entity: ListingEntity): Listing {
     const {
@@ -102,7 +102,6 @@ export class ListingService {
       listingType,
       price,
       description,
-      isSaved,
       createdAt,
       expiresAt,
       creator,
@@ -130,7 +129,6 @@ export class ListingService {
             price: listing.price,
             description: listing.description,
             listingType: listing.listingType,
-            isSaved: listing.isSaved,
             createdAt: listing.createdAt,
             expiresAt: listing.expiresAt,
             creator: {
@@ -160,7 +158,6 @@ export class ListingService {
       listingType,
       price,
       description,
-      isSaved,
       createdAt,
       expiresAt,
       creator: mappedCreator,
