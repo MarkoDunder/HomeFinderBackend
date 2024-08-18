@@ -34,10 +34,16 @@ export class ListingEntity {
   @Column({ nullable: true })
   expiresAt: Date;
 
-  @OneToOne(() => CustomLocationEntity)
+  @OneToOne(() => CustomLocationEntity, { cascade: true, onDelete: 'CASCADE' })
   @JoinColumn()
   customLocation: CustomLocationEntity;
 
   @ManyToOne(() => UserEntity, (userEntity) => userEntity.listings)
   creator: UserEntity;
+
+  @Column('simple-array', { nullable: true })
+  imageUrls?: string[];
+
+  @Column({ default: false })
+  isDeleted: boolean;
 }

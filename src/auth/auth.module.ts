@@ -11,6 +11,7 @@ import { UserService } from './services/user.service';
 import { UserController } from './controllers/user.controller';
 import { FriendRequestEntity } from './models/friend-request.entity';
 import { ChatModule } from 'src/chat/chat.module';
+import { AmazonS3UploadService } from './services/amazonS3.upload.service';
 
 @Module({
   imports: [
@@ -23,8 +24,15 @@ import { ChatModule } from 'src/chat/chat.module';
     TypeOrmModule.forFeature([UserEntity, FriendRequestEntity]),
     ChatModule,
   ],
-  providers: [AuthService, JwtGuard, JwtStrategy, RolesGuard, UserService],
+  providers: [
+    AuthService,
+    JwtGuard,
+    JwtStrategy,
+    RolesGuard,
+    UserService,
+    AmazonS3UploadService,
+  ],
   controllers: [AuthController, UserController],
-  exports: [AuthService, UserService],
+  exports: [AuthService, UserService, AmazonS3UploadService],
 })
 export class AuthModule {}

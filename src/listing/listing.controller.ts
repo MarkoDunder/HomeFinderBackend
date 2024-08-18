@@ -1,36 +1,64 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
+  HttpException,
   Param,
   Post,
   Put,
   Request,
+  UploadedFile,
   UseGuards,
+  UseInterceptors,
 } from '@nestjs/common';
 import { ListingService } from './listing.service';
 import { Listing } from './models/listing.interface';
 import { Observable } from 'rxjs';
-import { DeleteResult, UpdateResult } from 'typeorm';
 import { JwtGuard } from 'src/auth/guards/jwt.guard';
 import { Roles } from 'src/auth/decorators/roles.decorator';
 import { Role } from 'src/auth/models/role.enum';
 import { RolesGuard } from 'src/auth/guards/roles.guard';
 import { IsCreatorGuard } from './guards/is-creator.guard';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { CreateListingDTO } from './dto/createListing.dto';
+import { UpdateListingDTO } from './dto/updateListing.dto';
+import { AmazonS3UploadService } from 'src/auth/services/amazonS3.upload.service';
+import { ListingEntity } from './models/listing.entity';
 
 @Controller('listing')
 export class ListingController {
-  constructor(private listingService: ListingService) {}
+  constructor(
+    private listingService: ListingService,
+    private s3Service: AmazonS3UploadService,
+  ) {}
 
-  @Get('/')
-  findAll(): Observable<Listing[]> {
-    return this.listingService.findAllListings();
+  @Get('all')
+  findAllListings2(): Promise<ListingEntity[]> {
+    console.error('error');
+    return this.listingService.findAllListings2();
+  }
+  @Get('/rent')
+  getRented(): Observable<ListingEntity[]> {
+    return this.listingService.findRentListings();
+  }
+
+  @Get('/sale')
+  getForSale(): Observable<ListingEntity[]> {
+    return this.listingService.findSaleListings();
   }
 
   @Get(':id')
   findById(@Param('id') id: number): Observable<Listing> {
     return this.listingService.findListingById(id);
+  }
+
+  @Post(':id/soft-delete')
+  async softDeleteListing(@Param('id') id: number): Promise<void> {
+    try {
+      await this.listingService.softDeleteListing(id);
+    } catch (error) {
+      throw new HttpException(error.message, error.status);
+    }
   }
 
   // @Roles(Role.USER, Role.ADMIN)
@@ -45,22 +73,53 @@ export class ListingController {
   @Roles(Role.USER, Role.ADMIN)
   @UseGuards(JwtGuard, RolesGuard)
   @Post()
-  create(@Body() listing: Listing, @Request() req): Promise<Listing> {
+  create(@Body() listing: CreateListingDTO, @Request() req): Promise<Listing> {
     return this.listingService.createListing(req.user, listing);
   }
 
+  @Post('upload-image')
+  @UseInterceptors(FileInterceptor('image'))
+  async uploadImage(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<{ imageUrl: string }> {
+    const key = `listing-images/${Date.now()}-${file.originalname}`;
+    const imageUrl = await this.s3Service.uploadFile(file, key);
+    return { imageUrl };
+  }
+
+  @Post('add-image-to-listing')
+  async addImageToListing(
+    @Body() { listingId, imageUrl }: { listingId: number; imageUrl: string },
+  ) {
+    return this.listingService.addUploadFileUrls(listingId, [imageUrl]);
+  }
+
+  @Roles(Role.USER, Role.ADMIN)
   @UseGuards(JwtGuard, IsCreatorGuard)
-  @Put(':id')
-  update(
+  @Post(':id/update-title')
+  async updateTitle(@Param('id') id: number, @Body() title: string) {
+    return this.listingService.updateTitle(id, title);
+  }
+
+  @Roles(Role.USER, Role.ADMIN)
+  @UseGuards(JwtGuard, IsCreatorGuard)
+  @Put(':id/update')
+  async update(
     @Param('id') id: number,
-    @Body() listing: Listing,
-  ): Observable<UpdateResult> {
+    @Body() listing: UpdateListingDTO,
+  ): Promise<ListingEntity> {
+    console.error('error updating');
     return this.listingService.updateListing(id, listing);
   }
 
+  @Roles(Role.USER, Role.ADMIN)
   @UseGuards(JwtGuard, IsCreatorGuard)
-  @Delete(':id')
-  delete(@Param('id') id: number): Observable<DeleteResult> {
-    return this.listingService.deleteListing(id);
+  @Put('update2/:id')
+  async update2(
+    @Param('id') id: number,
+    @Body() listing: CreateListingDTO,
+  ): Promise<void> {
+    console.error('error updating');
+    return this.listingService.updateListing2(id, listing);
   }
 }

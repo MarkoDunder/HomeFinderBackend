@@ -51,8 +51,8 @@ export class UserService {
   }
 
   hasRequestBeenSentOrReceived(
-    creator: User,
-    receiver: User,
+    creator: UserEntity,
+    receiver: UserEntity,
   ): Observable<boolean> {
     return from(
       this.friendRequestRepository.findOne({
@@ -71,13 +71,13 @@ export class UserService {
 
   sendFriendRequest(
     receiverId: number,
-    creator: User,
+    creator: UserEntity,
   ): Observable<FriendRequest | { error: string }> {
     if (receiverId === creator.id)
       return of({ error: 'You cannot add yourself!' });
 
     return this.findUserById(receiverId).pipe(
-      switchMap((receiver: User) => {
+      switchMap((receiver: UserEntity) => {
         return this.hasRequestBeenSentOrReceived(creator, receiver).pipe(
           switchMap((hasRequestBeenSentOrReceived: boolean) => {
             if (hasRequestBeenSentOrReceived)
@@ -100,10 +100,10 @@ export class UserService {
 
   getFriendRequestStatus(
     receiverId: number,
-    currentUser: User,
+    currentUser: UserEntity,
   ): Observable<FriendRequestStatus> {
     return this.findUserById(receiverId).pipe(
-      switchMap((receiver: User) => {
+      switchMap((receiver: UserEntity) => {
         return from(
           this.friendRequestRepository.findOne({
             where: [{ creator: currentUser, receiver }],
@@ -141,7 +141,7 @@ export class UserService {
   }
 
   getFriendRequestsFromRecipients(
-    currentUser: User,
+    currentUser: UserEntity,
   ): Observable<FriendRequest[]> {
     return from(
       this.friendRequestRepository.find({
@@ -151,7 +151,7 @@ export class UserService {
     );
   }
 
-  getFriends(currentUser: User): Observable<User[]> {
+  getFriends(currentUser: UserEntity): Observable<User[]> {
     return from(
       this.friendRequestRepository.find({
         where: [

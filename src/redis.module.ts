@@ -10,7 +10,8 @@ import { CacheModule } from '@nestjs/cache-manager';
     CacheModule.registerAsync({
       useFactory: async () => ({
         store: await redisStore({
-          url: process.env.REDIS_URI, // Directly using the environment variable
+          url: process.env.REDIS_URI,
+          ttl: 5000,
         }),
       }),
       isGlobal: true,

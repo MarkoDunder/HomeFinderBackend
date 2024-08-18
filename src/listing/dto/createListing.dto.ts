@@ -28,4 +28,6 @@ export class CreateListingDTO {
 
   @IsNotEmpty()
   customLocation: CustomLocation;
+
+  imagePaths: string[];
 }

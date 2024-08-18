@@ -1,30 +1,34 @@
 import {
   IsEnum,
-  IsNotEmpty,
   IsNumber,
   IsString,
   Length,
+  IsOptional,
 } from 'class-validator';
 import { ListingType } from '../models/listingType.enum';
 import { CustomLocation } from 'src/location/models/location.interface';
 
 export class UpdateListingDTO {
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
   @Length(1, 255)
   title: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsEnum(ListingType)
   listingType: ListingType;
 
+  @IsOptional()
   @IsNumber()
-  @IsNotEmpty()
   price: number;
 
+  @IsOptional()
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   customLocation: CustomLocation;
+
+  @IsOptional()
+  imageUrls: string[];
 }

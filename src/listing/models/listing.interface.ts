@@ -12,4 +12,6 @@ export interface Listing {
   expiresAt: Date;
   creator: User;
   customLocation: CustomLocation;
+  imageUrls?: string[];
+  isDeleted: boolean;
 }

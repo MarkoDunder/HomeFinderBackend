@@ -7,10 +7,8 @@ import {
 } from '@nestjs/websockets';
 import { RedisCacheService } from 'src/redis.cache.service';
 import { Server, Socket } from 'socket.io';
-import { AuthService } from 'src/auth/services/auth.service';
 import { ActiveUser } from './interfaces/ActiveUser.interface';
 import { UserService } from 'src/auth/services/user.service';
-import { firstValueFrom } from 'rxjs';
 import { JwtService } from '@nestjs/jwt';
 import { UserJwt } from './interfaces/UserJwt.interface';
 
@@ -20,7 +18,6 @@ export class PresenceGateway
 {
   constructor(
     private readonly cache: RedisCacheService,
-    private readonly authService: AuthService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
   ) {}
@@ -28,10 +25,10 @@ export class PresenceGateway
   @WebSocketServer()
   server: Server;
 
-  private async getFriends(userId: number) {
+  /* private async getFriends(userId: number) {
     const userObservable = this.userService.findUserById(userId);
     const user = await firstValueFrom(userObservable);
-    const friends = this.userService.getFriends(user);
+    const friends = this.userService.getFriends(userObservable);
     return await firstValueFrom(friends);
   }
 
@@ -57,7 +54,7 @@ export class PresenceGateway
         });
       }
     }
-  }
+  } */
 
   private async setActiveStatus(socket: Socket, isActive: boolean) {
     const user = socket.data?.user;
@@ -72,7 +69,7 @@ export class PresenceGateway
     };
 
     await this.cache.set(`user ${user.id}`, activeUser);
-    await this.emitStatusToFriends(activeUser);
+    //await this.emitStatusToFriends(activeUser);
   }
 
   async handleDisconnect(socket: Socket) {

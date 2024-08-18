@@ -31,6 +31,7 @@ import { RedisModule } from './redis.module';
     ChatModule,
     CustomLocationModule,
     RedisModule,
+    ConfigModule.forRoot({ isGlobal: true }),
   ],
   providers: [
     AppService,
