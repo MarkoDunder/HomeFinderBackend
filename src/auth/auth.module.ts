@@ -33,6 +33,6 @@ import { AmazonS3UploadService } from './services/amazonS3.upload.service';
     AmazonS3UploadService,
   ],
   controllers: [AuthController, UserController],
-  exports: [AuthService, UserService, AmazonS3UploadService],
+  exports: [AuthService, UserService, AmazonS3UploadService, TypeOrmModule],
 })
 export class AuthModule {}

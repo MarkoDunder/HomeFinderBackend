@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   HttpException,
   Param,
@@ -94,11 +95,39 @@ export class ListingController {
     return this.listingService.addUploadFileUrls(listingId, [imageUrl]);
   }
 
-  @Roles(Role.USER, Role.ADMIN)
+  /* @Roles(Role.USER, Role.ADMIN)
   @UseGuards(JwtGuard, IsCreatorGuard)
   @Post(':id/update-title')
   async updateTitle(@Param('id') id: number, @Body() title: string) {
     return this.listingService.updateTitle(id, title);
+  } */
+  @UseGuards(JwtGuard)
+  @Post('bookmark/:listingId')
+  async bookmarkListing(
+    @Param('listingId') listingId: number,
+    @Request() req,
+  ): Promise<void> {
+    const userId = req.user.id;
+    return this.listingService.bookmarkListing(userId, listingId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Delete('bookmark-delete/:listingId')
+  async unbookmarkListing(
+    @Param('listingId') listingId: number,
+    @Request() req,
+  ): Promise<void> {
+    const userId = req.user.id;
+    return this.listingService.unbookmarkListing(userId, listingId);
+  }
+
+  @UseGuards(JwtGuard)
+  @Get('bookmarks/:userId')
+  async getBookmarkedListings(
+    @Param('userId') userId: number,
+  ): Promise<ListingEntity[]> {
+    console.error(`User id ; ${userId}`);
+    return this.listingService.getBookmarkedListings(userId);
   }
 
   @Roles(Role.USER, Role.ADMIN)

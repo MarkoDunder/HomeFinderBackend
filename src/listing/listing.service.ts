@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Listing } from './models/listing.interface';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ListingEntity } from './models/listing.entity';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, In, Repository } from 'typeorm';
 import { Observable, from } from 'rxjs';
 import { UpdateListingDTO } from './dto/updateListing.dto';
 import { CreateListingDTO } from './dto/createListing.dto';
@@ -20,6 +20,8 @@ export class ListingService {
     private readonly listingRepository: Repository<ListingEntity>,
     @InjectRepository(CustomLocationEntity)
     private readonly locationRepository: Repository<CustomLocationEntity>,
+    @InjectRepository(UserEntity)
+    private readonly userRepository: Repository<UserEntity>,
     private readonly s3Service: AmazonS3UploadService,
     private readonly dataSource: DataSource,
   ) {}
@@ -174,7 +176,7 @@ export class ListingService {
     console.log(`Listing with ID ${id} marked as deleted`);
   }
 
-  async updateTitle(id: number, title: string): Promise<void> {
+  /* async updateTitle(id: number, title: string): Promise<void> {
     const listing = await this.listingRepository.findOne({
       where: { id },
     });
@@ -188,13 +190,88 @@ export class ListingService {
       title,
     });
 
-    console.log(`Listing with ID ${id} was updated`);
-  }
+    return  result;
+  } */
 
   private calculateExpirationDate(): Date {
     const expiresAt = new Date();
     expiresAt.setDate(expiresAt.getDate() + 60);
     return expiresAt;
+  }
+
+  async bookmarkListing(userId: number, listingId: number): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    const listing = await this.listingRepository.findOne({
+      where: { id: listingId, isDeleted: false },
+    });
+
+    if (!user || !listing) {
+      throw new HttpException(
+        'User or Listing not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    if (!user.bookmarkedListings) {
+      user.bookmarkedListings = [];
+    }
+
+    if (!user.bookmarkedListings.includes(listingId)) {
+      user.bookmarkedListings.push(listingId);
+      await this.userRepository.save(user);
+    } else {
+      throw new HttpException(
+        'Listing already bookmarked',
+        HttpStatus.BAD_REQUEST,
+      );
+    }
+  }
+
+  async unbookmarkListing(userId: number, listingId: number): Promise<void> {
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+
+    if (!user || !user.bookmarkedListings) {
+      throw new HttpException(
+        'User or Bookmark not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    user.bookmarkedListings = user.bookmarkedListings.filter(
+      (id) => id !== listingId,
+    );
+
+    await this.userRepository.save(user);
+  }
+
+  async getBookmarkedListings(userId: number): Promise<ListingEntity[]> {
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+    }
+
+    // Fetch the bookmarked listing IDs from the user
+    const bookmarkedIds = user.bookmarkedListings || [];
+
+    if (bookmarkedIds.length === 0) {
+      return [];
+    }
+
+    console.log('Bookmarked Listings IDs:', bookmarkedIds);
+
+    // Fetch the listings based on the bookmarked IDs
+    const listings = await this.listingRepository.find({
+      where: {
+        id: In(bookmarkedIds),
+        isDeleted: false,
+      },
+    });
+
+    console.log('Listings fetched:', listings);
+    return listings;
   }
 
   private toListing(entity: ListingEntity): Listing {
@@ -243,6 +320,7 @@ export class ListingService {
               lastName: listing.creator.lastName,
               email: listing.creator.email,
               listings: [], // Provide an empty array to satisfy the User interface  -- QUESTIONABLE
+              bookmarkedListings: [],
               friendRequestCreator: [],
               friendRequestReceiver: [],
               conversations: [],
@@ -260,6 +338,7 @@ export class ListingService {
               : null,
           }))
         : [],
+      bookmarkedListings: creator.bookmarkedListings,
       friendRequestCreator: creator.friendRequestCreator || [], // Populate with actual data or default to empty array
       friendRequestReceiver: creator.friendRequestReceiver || [], // Populate with actual data or default to empty array
       conversations: creator.conversations || [], // Populate with actual data or default to empty array

@@ -37,6 +37,9 @@ export class UserEntity {
   @OneToMany(() => ListingEntity, (listingEntity) => listingEntity.creator)
   listings: ListingEntity[];
 
+  @Column('simple-array', { nullable: true })
+  bookmarkedListings: number[];
+
   @OneToMany(
     () => FriendRequestEntity,
     (friendRequestEntity) => friendRequestEntity.creator,

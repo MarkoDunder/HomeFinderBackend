@@ -13,6 +13,7 @@ export interface User {
   imagePath?: string;
   role?: Role;
   listings: Listing[];
+  bookmarkedListings?: number[];
   friendRequestCreator: FriendRequestEntity[];
   friendRequestReceiver: FriendRequestEntity[];
   conversations: ConversationEntity[];
